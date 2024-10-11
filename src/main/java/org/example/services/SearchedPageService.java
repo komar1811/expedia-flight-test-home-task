@@ -14,23 +14,33 @@ public class SearchedPageService extends BaseService {
 
     private SearchedPage searchedPage = new SearchedPage(webDriver);
 
-     public SearchedPageService filterResults(){
-         MyLogger.logger.info("User clicks on a nonstop filter button");
-         searchedPage.filterCards();
-         return this;
-     }
+    public SearchedPageService filterResults() {
+        MyLogger.logger.info("User clicks on a nonstop filter button");
+        searchedPage.filterCards();
+        return this;
+    }
 
     @SneakyThrows
-    public SearchedPageService verifyDepartureFlightResults(String departmentAirport, String destinationAirport, LocalDate departureDate, LocalDate returnDate, String flightMode) {
+    public SearchedPageService verifyFlightDatesResults(LocalDate departureDate, LocalDate returnDate) {
+        String departureDateTime = departureDate.getMonth().toString().charAt(0) + departureDate.getMonth().toString().substring(1,3).toLowerCase() + " " + departureDate.getDayOfMonth();
+        String returnDateTime = returnDate.getMonth().toString().charAt(0) + returnDate.getMonth().toString().substring(1,3).toLowerCase() + " " + returnDate.getDayOfMonth();
+
+        if(!searchedPage.getStartDate().contains(departureDateTime)||!searchedPage.getEndDate().contains(returnDateTime)){
+            searchedPage.chooseDates(departureDate, returnDate);
+        }
+        SoftAssertion.assertThat("Check if from date for Departure Flight is appropriate", () -> searchedPage.getStartDate(), containsStringIgnoringCase(departureDateTime));
+        SoftAssertion.assertThat("Check if to date for Departure Flight is appropriate", () -> searchedPage.getEndDate(), containsStringIgnoringCase(returnDateTime));
+       return this;
+    }
+
+
+        @SneakyThrows
+    public SearchedPageService verifyDepartureFlightResults(String departmentAirport, String destinationAirport, String flightMode) {
         Wait.forAjax();
         SoftAssertion.assertThat("Check if any result for Departure Flight is found", () -> searchedPage.getFirstSearchedCard().isDisplayed(), is(true));
         SoftAssertion.assertThat("Check if from airport for Departure Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDestinationAirportInfo(), containsStringIgnoringCase(destinationAirport));
         SoftAssertion.assertThat("Check if to airport for Departure Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDepartmentAirportInfo(), containsStringIgnoringCase(departmentAirport));
-        String departureDateTime = departureDate.getMonth().toString().charAt(0) + departureDate.getMonth().toString().substring(1).toLowerCase() + " " + departureDate.getDayOfMonth();
-        String returnDateTime = returnDate.getMonth().toString().charAt(0) + returnDate.getMonth().toString().substring(1).toLowerCase() + " " + returnDate.getDayOfMonth();
-        SoftAssertion.assertThat("Check if from date for Departure Flight is appropriate", () -> searchedPage.getSelectedDate(), containsStringIgnoringCase(departureDateTime));
-        SoftAssertion.assertThat("Check if to date for Departure Flight is appropriate", () -> searchedPage.getSelectedDate(), containsStringIgnoringCase(returnDateTime));
-        SoftAssertion.assertThat("Check if flight for Departure Flight is nonstop", () -> searchedPage.getFirstSearchedCard().getJourneyDurationInfo(), containsStringIgnoringCase(flightMode));
+       SoftAssertion.assertThat("Check if flight for Departure Flight is nonstop", () -> searchedPage.getFirstSearchedCard().getJourneyDurationInfo(), containsStringIgnoringCase(flightMode));
         return this;
     }
 
@@ -38,14 +48,14 @@ public class SearchedPageService extends BaseService {
     public SearchedPageService verifyReturnFlightResults(String departmentAirport, String destinationAirport, String flightMode) {
         Wait.forAjax();
         SoftAssertion.assertThat("Check if any result for Return Flight is found", () -> searchedPage.getFirstSearchedCard().isDisplayed(), is(true));
-        SoftAssertion.assertThat("Check if from airport for Return Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDestinationAirportInfo(), containsStringIgnoringCase(destinationAirport));
-        SoftAssertion.assertThat("Check if to airport for Return Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDepartmentAirportInfo(), containsStringIgnoringCase(departmentAirport));
+        SoftAssertion.assertThat("Check if from airport for Return Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDestinationAirportInfo(), containsStringIgnoringCase(departmentAirport));
+        SoftAssertion.assertThat("Check if to airport for Return Flight is appropriate", () -> searchedPage.getFirstSearchedCard().getDepartmentAirportInfo(), containsStringIgnoringCase(destinationAirport));
         SoftAssertion.assertThat("Check if flight for Return Flight is nonstop", () -> searchedPage.getFirstSearchedCard().getJourneyDurationInfo(), containsStringIgnoringCase(flightMode));
         return this;
     }
 
     public SearchedPageService selectDepartureFlight() {
-         MyLogger.logger.info("User clicks on a first flight offer result");
+        MyLogger.logger.info("User clicks on a first flight offer result");
         searchedPage.selectFirstFlightCard();
         MyLogger.logger.info("User chooses fare");
         searchedPage.chooseFirstFare();
@@ -53,7 +63,7 @@ public class SearchedPageService extends BaseService {
     }
 
     public FlightDetailsPageService selectReturnFlight() {
-         MyLogger.logger.info("User clicks on a first flight offer result");
+        MyLogger.logger.info("User clicks on a first flight offer result");
         searchedPage.selectFirstFlightCard();
         MyLogger.logger.info("User chooses fare");
         searchedPage.chooseFirstFare();

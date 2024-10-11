@@ -1,6 +1,7 @@
 package org.example.pageobject.pages;
 
 import org.example.pageobject.BasePage;
+import org.example.pageobject.blocks.pop_ups.CalendarPopUpBlock;
 import org.example.pageobject.blocks.pop_ups.FareSelectionPopUpBlock;
 import org.example.pageobject.blocks.FilterBlock;
 import org.example.pageobject.blocks.pop_ups.RecomendationPopUpBlock;
@@ -11,12 +12,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class SearchedPage extends BasePage {
 
-    @FindBy(xpath = "//button[@aria-selected=\"true\"]")
-    private CustomWebElement selectedDate;
+    @FindBy(xpath = "//button[@data-name=\"startDate\"]")
+    private CustomWebElement fromDate;
+    @FindBy(xpath = "//button[@data-name=\"endDate\"]")
+    private CustomWebElement endDate;
+
 
     public FilterBlock getFilterBlock(){
         Wait.forAjax();
@@ -33,8 +38,18 @@ public class SearchedPage extends BasePage {
         return getSearchedCards().getFirst();
     }
 
-    public String getSelectedDate(){
-        return selectedDate.getAttribute("aria-label");
+    public void chooseDates(LocalDate startDate, LocalDate returnDate) {
+        fromDate.click();
+        CalendarPopUpBlock calendarPopUpBlock = new CalendarPopUpBlock(By.xpath("//div[@class=\"uitk-date-picker date-picker-menu\"]"));
+        calendarPopUpBlock.setDates(startDate, returnDate);
+    }
+
+    public String getStartDate(){
+        return fromDate.getText();
+    }
+
+    public String getEndDate(){
+        return endDate.getText();
     }
 
     public void filterCards(){

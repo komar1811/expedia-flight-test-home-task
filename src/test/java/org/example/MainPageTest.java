@@ -21,11 +21,12 @@ public class MainPageTest extends BaseTest {
                         LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-return")),
                         PropertiesReader.readNumberProperty("adult-travelers-number"))
 
+                .verifyFlightDatesResults(LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-departure")),
+                        LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-return")))
+
                 .filterResults()
                 .verifyDepartureFlightResults(PropertiesReader.readProperty("origin-airport"),
                         PropertiesReader.readProperty("destination-airport"),
-                        LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-departure")),
-                        LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-return")),
                         PropertiesReader.readProperty("filter"))
                 .selectDepartureFlight()
 
@@ -35,10 +36,16 @@ public class MainPageTest extends BaseTest {
                         PropertiesReader.readProperty("filter"))
                 .selectReturnFlight()
 
-                .verifyFlightDetails(PropertiesReader.readProperty("origin-city"),
+                .verifyDepartureFlightDetails(PropertiesReader.readProperty("origin-city"),
                         PropertiesReader.readProperty("destination-city"),
                         PropertiesReader.readProperty("origin-airport"),
                         PropertiesReader.readProperty("destination-airport"),
+                        LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-departure")),
+                        LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-return")))
+                .verifyDestinationFlightDetails(PropertiesReader.readProperty("destination-city"),
+                        PropertiesReader.readProperty("origin-city"),
+                        PropertiesReader.readProperty("destination-airport"),
+                        PropertiesReader.readProperty("origin-airport"),
                         LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-departure")),
                         LocalDate.now().plusDays(PropertiesReader.readNumberProperty("days-after-now-return")));
 
